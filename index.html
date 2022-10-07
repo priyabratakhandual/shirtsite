@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="show">
+        
+      </div>
+    </div>
+    <script>
+      const shirtData=[
+        {"image":"https://i.ibb.co/VvGjZnK/s1.jpg","sizes":["S","L","XXL"], "brand":"Van Heusen","price":1299,"discount":"10%"},
+        {"image":"https://i.ibb.co/XyXsX4w/s2.jpg","sizes":["XS","M","XXL"], "brand":"Louis Phillipe","price":1499,"discount":"20%"},
+        {"image":"https://i.ibb.co/LZbmJyK/s3.jpg","sizes":["XS","S","L","XXL"], "brand":"Arrow","price":1199,"discount":"30%"},
+        {"image":"https://i.ibb.co/swFq71s/s4.jpg","sizes":["S","M","L"],"brand":"Blackberrys","price":849,"discount":"10%"}
+     ];
+     let size=["XS","S","M","L","XL","XXL"]
+     let discounts=["10%","20%","30%","None"]
+     let brands=["Van Heusen","Louis Phillipe","Arrow","Blackberrys","Allen Solly"]
+      let editIndex =-1;
+       let myproduct ={};
+       let errors={}
+      function show(active){
+        let str=makeNavbar(active);
+        active === 1?str+=showShirt():str+=""
+        active ===2?str+=addShirt():str+=""
+        document.getElementById("show").innerHTML=str
+      }
+      function showproduct(){
+        editIndex =-1;
+        myproduct={}
+        show(1)
+      }function addproductForm(){
+        show(2)
+      }function editShirt(index){
+          editIndex = index;
+          myproduct = shirtData[index];
+          addproductForm();
+      }function validates(pr){
+        errors.image= pr.image?'':'image is Mandatory'
+        errors.size=pr.sizes.length>=1?"":"At least one size choose"
+        errors.brand= pr.brand?'':"Brand is manadatory"
+        errors.price= pr.price?'':"price is Mandatory"
+        errors.discount=pr.discount?'':"Choose one of discount"
+        return !(errors.image||errors.sizes||errors.brand||errors.price||errors.discount)
+      }
+      function makeNavbar( active=0){https://i.ibb.co/VvGjZnK/s1.jpg
+        console.log(active)
+        let str ='<nav class="navbar navbar-expand-lg navbar-light bg-light">';
+        str+='<a class="navbar-brand" href="#">ShirtSite</a>'
+        str+='<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown">'
+        str+='<span class="navbar-toggler-icon"></span>';
+        str+='</button>';
+        str+='<div class="collapse navbar-collapse" id="navbarNavDropdown">';
+        str+='<ul class="navbar-nav">'
+        let active1= active==1?'active':'';
+        let active2= active==2?'active':'';
+        str+='<li class="nav-item " '+active1+'>'
+        str+='<a class="nav-link" onclick="showproduct()">Shirts</a>'
+        str+='</li>'
+        str+='<li class="nav-item" '+active2+'>'
+        str+='<a class="nav-link" onclick="addproductForm()">Add a Shirts</a>'
+        str+='</li>'
+        str+='</ul>'
+        str+='</div>'
+        str+='</nav>'
+        return str;
+      }function showShirt(index){
+        let arr=shirtData.map((pr,index)=>{
+        let {image,sizes,brand,price,discount}=pr;
+        let str='<div class="row border">'
+        str+='<div class="col-3" onclick="display('+index+')"><img src="'+image+' height="50px" width="50px"></div>';
+        str+='<div class="col-3">'+"Brand:"+brand+"<br>"+"Price:"+price+"<br>"+"sizes:"+sizes+"<br>"+"Discount"+discount+'</div>'
+        str+='</div>'
+        return str;
+        })
+        let str1='<div class="row border">'
+        str1+='<div class="col-6">'+arr.join('')+'</div>'
+        str1+='<div class="col-6 col-akash" id="akash"></div>'
+        str1+='</div>'
+        return str1;
+      }function display(index){
+        let str='<div class="text-center"><img src="'+shirtData[index].image+'" height="90%" width="200px"><br>'+shirtData[index].brand+'<br><button class="btn btn-primary" onclick="editShirt('+index+')">Edit</button></div>'
+       document.getElementById("akash").innerHTML=str;
+      }
+      show()
+      function addShirt(){
+         let {image="",sizes=[],brand="",price="",discount=""}=myproduct
+         let title =editIndex>=0 ? "Edit product details":'Add a Product'
+        let str='<h3 class="text-center">'+title+'</h3>'
+        str+=makeTextfield('image','Product image','Enter URL of product image',image,errors.image)
+        str+=makeTextfield('price','Price','Enter the price',price,errors.price);
+        str+=makeDropdown("brand",brands,"Select Brand",brand,errors.brand);
+        str+=makeCheckbox("size",size,sizes,"Choose Size options",errors.size)+'<br>'
+        str+=makeRadios(discounts,"Choose Discount","discount",discount,errors.discount)
+         str+='<br><button class="btn btn-primary" onclick="submitShirt()">Add a Productt</button>';
+        return str;
+      }function submitShirt(){
+        let image = document.getElementById("image").value
+        let price = document.getElementById("price").value
+        let brand= document.getElementById("brand").value
+        let box= document.getElementsByName("size")
+        let radios1= document.getElementsByName("discount")
+        let sizes=[];
+        let discount='';
+        for(let i=0;i<box.length;i++)
+          if(box[i].checked)
+            sizes.push(box[i].value)
+        for(let i=0;i<radios1.length;i++)
+          if(radios1[i].checked)
+            discount=radios1[i].value;
+        let pr={image:image,sizes:sizes,brand:brand,price:price,discount:discount}
+        if(validates(pr)){
+          editIndex>=0 ? shirtData[editIndex]=pr: shirtData.push(pr);
+          showproduct()
+        }
+        else{
+          //myproduct=pr;
+          addproductForm();
+        }
+      }
+       function makeTextfield(id,label,placeholder,value='',err=""){
+        let str ='<div class="form-group">';
+        str+='<label>'+label+'</label>'
+        str+='<input type="text" class="form-control" id="'+id+'" placeholder ="'+placeholder+'" value="'+value+'">'
+        str+='</div>'
+        str+=err ? '<span class="text-danger">'+err+'</span>':"";
+        return str;
+      }function makeRadios(arr,label,name,radiovalue='',err=""){
+        const arr1= arr.map(opt=>{
+          let checked= radiovalue==opt?'checked':" "
+          let str='<div class="form-check form-check-inline">';
+          str+='<input class="form-check-input" type="radio" name="'+name+'" value="'+opt+'" '+checked+'>' 
+          str+='<label class="form-check-label">'+opt+'</label>'
+          str+='</div>'
+          return str    
+        })
+        let s1='<div class="form-check-lebel ">'
+        s1+='<label class="form-check-lebel">'+label+'</label>'
+        s1+='</div>'
+        s1+=arr1.join('');
+        s1+=err ? '<span class="text-danger">'+err+'</span>':"";
+        return s1;
+      }
+      function makeDropdown(id,options,header,selvalue='',err=""){
+        const arr1= options.map(opt=>{
+          let selcted =opt===selvalue?'selected':''
+          return '<option '+selcted+'>'+opt+'</option>'
+        })
+        let s1= '<div class="form-group">';
+        s1+='<select id="'+id+'" class="form-control">';
+        let selectedheader= selvalue?"":"selected";
+        s1+='<option value="" disabled '+selectedheader+'>'+header+'</option>'
+        s1+=arr1.join('')
+        s1+='</select>'
+        s1+='</div>'
+        s1+=err ? '<span class="text-danger">'+err+"<br>"+'</span>':"";
+        return s1;
+      }
+       function makeCheckbox(name,options,arr,label,err=""){
+        let arr1= options.map(opt=>{
+          let arr2=arr.find(st=>{
+            return opt==st
+          })
+            let c1=arr2?'checked':""
+            let str='<div class="form-check">';
+            str+='<input type="checkbox" value='+opt+' name="'+name+'" class="form-check-input" id="'+opt+'" '+c1+'>';
+            str+='<label class="form-check-lebel">'+opt+'</label>';
+            str+='</div>'
+            return str;
+        })
+        let str='<label class="form-check-lebel">'+label+'</label>';
+        str+=arr1.join("")
+        str+=err ? '<span class="text-danger">'+err+'</span>':"";
+        return str;
+      } 
+    </script>
+  </body>
+</html>
