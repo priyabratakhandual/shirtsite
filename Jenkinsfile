@@ -10,34 +10,37 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from your repository
                 git 'https://github.com/priyabratakhandual/shirtsite.git'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy static files to the server
-                sh '''
-                scp -r * ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}
-                '''
+                withCredentials([sshUserPrivateKey(credentialsId: '8e7f6548-61aa-45d7-9f3f-5aba166533e6', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    mkdir -p ~/.ssh
+                    ssh-keyscan -H ${SERVER_IP} >> ~/.ssh/known_hosts
+                    scp -i ${SSH_KEY} -r * ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}
+                    '''
+                }
             }
         }
 
         stage('Restart NGINX') {
             steps {
-                // Restart NGINX to apply changes if necessary
-                sh '''
-                ssh ${SERVER_USER}@${SERVER_IP} "sudo systemctl restart nginx"
-                '''
+                withCredentials([sshUserPrivateKey(credentialsId: '8e7f6548-61aa-45d7-9f3f-5aba166533e6', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    ssh -i ${SSH_KEY} ${SERVER_USER}@${SERVER_IP} "sudo systemctl restart nginx"
+                    '''
+                }
             }
         }
     }
 
     post {
         always {
-            // Clean up workspace
             cleanWs()
         }
     }
 }
+
